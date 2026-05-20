@@ -1,25 +1,34 @@
 import express, { Request, Response } from 'express';
+import { Pool } from 'pg';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-
 app.use(express.json());
 
-interface HealthResponse {
-  status: string;
-  engine: string;
-  timestamp: string;
-}
-
-app.get('/api/node/health', (req: Request, res: Response) => {
-  const response: HealthResponse = {
-    status: 'up',
-    engine: 'Node.js (TypeScript)',
-    timestamp: new Date().toISOString()
-  };
-  res.json(response);
+const pool = new Pool({
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: parseInt(process.env.DB_PORT || '5432', 10),
 });
 
+// Demo endpoint to fetch active incident alerts
+app.get('/api/node/incidents', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { rows } = await pool.query('SELECT * FROM incidents ORDER BY updated_at DESC');
+    res.json({ status: 'success', data: rows });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ status: 'error', message: 'Database query failed' });
+  }
+});
+
+// Healthcheck endpoint
+app.get('/api/node/health', (req: Request, res: Response): void => {
+  res.json({ status: 'healthy', service: 'api-node' });
+});
+
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Node TS REST API listening on port ${PORT}`);
+  console.log(`Node TypeScript API successfully listening on port ${PORT}`);
 });
