@@ -1,2 +1,2 @@
 # api-node
-Node REST API
+Node TS REST API
