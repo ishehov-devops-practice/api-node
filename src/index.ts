@@ -13,15 +13,22 @@ const pool = new Pool({
 });
 
 // Demo endpoint to fetch active incident alerts
-app.get('/api/node/incidents', async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { rows } = await pool.query('SELECT * FROM incidents ORDER BY updated_at DESC');
-    res.json({ status: 'success', data: rows });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ status: 'error', message: 'Database query failed' });
+app.get(
+  '/api/node/incidents',
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { rows } = await pool.query(
+        'SELECT * FROM incidents ORDER BY updated_at DESC'
+      );
+      res.json({ status: 'success', data: rows });
+    } catch (err) {
+      console.error(err);
+      res
+        .status(500)
+        .json({ status: 'error', message: 'Database query failed' });
+    }
   }
-});
+);
 
 // Healthcheck endpoint
 app.get('/api/node/health', (req: Request, res: Response): void => {
@@ -32,3 +39,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Node TypeScript API successfully listening on port ${PORT}`);
 });
+
+export default app;
