@@ -12,7 +12,7 @@ const pool = new Pool({
   port: parseInt(process.env.DB_PORT || '5432', 10),
 });
 
-// Demo endpoint to fetch active incident alerts
+// Demo endpoint to fetch active incident alertss
 app.get(
   '/api/node/incidents',
   async (req: Request, res: Response): Promise<void> => {
